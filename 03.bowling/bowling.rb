@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 score = ARGV[0]
 scores = score.split(',')
@@ -25,20 +26,18 @@ index = 0
     else
       point += shots[index] + shots[index + 1]
     end
+  elsif shots[index] == 10
+    # ストライクの処理
+    point += 10 + shots[index + 1] + shots[index + 2]
+    index += 1
+  elsif shots[index] + shots[index + 1] == 10
+    # スペアの処理
+    point += 10 + shots[index + 2]
+    index += 2
   else
-    if shots[index] == 10
-      # ストライクの処理
-      point += 10 + shots[index + 1] + shots[index + 2]
-      index += 1
-    elsif shots[index] + shots[index + 1] == 10
-      # スペアの処理
-      point += 10 + shots[index + 2]
-      index += 2
-    else
-      # 通常の処理
-      point += shots[index] + shots[index + 1]
-      index += 2
-    end
+    # 通常の処理
+    point += shots[index] + shots[index + 1]
+    index += 2
   end
 end
 
