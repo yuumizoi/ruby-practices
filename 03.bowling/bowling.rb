@@ -5,19 +5,19 @@ scores = score.split(',')
 
 shots = []
 
-scores.each do |s|
-  if s == 'X'
+scores.each do |score_value|
+  if score_value == 'X'
     shots << 10
   else
-    shots << s.to_i
+    shots << score_value.to_i
   end
 end
 
 point = 0
 index = 0
 
-10.times do |i|
-  if i == 9
+10.times do |frame_index|
+  if frame_index == 9
     if shots[index] == 10
       point += 10 + shots[index + 1] + shots[index + 2]
     elsif shots[index] + shots[index + 1] == 10
