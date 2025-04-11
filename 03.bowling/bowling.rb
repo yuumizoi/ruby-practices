@@ -16,19 +16,29 @@ end
 point = 0
 index = 0
 
-10.times do
-  if shots[index] == 10
-    # ストライクの処理
-    point += 10 + shots[index + 1] + shots[index + 2]
-    index += 1
-  elsif shots[index] + shots[index + 1] == 10
-    # スペアの処理
-    point += 10 + shots[index + 2]
-    index += 2
+10.times do |i|
+  if i == 9
+    if shots[index] == 10
+      point += 10 + shots[index + 1] + shots[index + 2]
+    elsif shots[index] + shots[index + 1] == 10
+      point += 10 + shots[index + 2]
+    else
+      point += shots[index] + shots[index + 1]
+    end
   else
-    # 通常の処理
-    point += shots[index] + shots[index + 1]
-    index += 2
+    if shots[index] == 10
+      # ストライクの処理
+      point += 10 + shots[index + 1] + shots[index + 2]
+      index += 1
+    elsif shots[index] + shots[index + 1] == 10
+      # スペアの処理
+      point += 10 + shots[index + 2]
+      index += 2
+    else
+      # 通常の処理
+      point += shots[index] + shots[index + 1]
+      index += 2
+    end
   end
 end
 
