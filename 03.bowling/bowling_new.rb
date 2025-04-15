@@ -1,31 +1,30 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-score = ARGV[0]
-scores = score.split(',')
+score_string = ARGV[0]
+scores = score_string.split(',')
+
 shots = []
-scores.each do |s|
-  if s == 'X'
+
+scores.each do |score_string_item|
+  if score_string_item == 'X'
     shots << 10
-    shots << 0
   else
-    shots << s.to_i
+    shots << score_string_item.to_i
   end
 end
 
 frames = []
-shots.each_slice(2) do |s|
-  frames << s
-end
+index = 0
 
-point = 0
-frames.each do |frame|
-  if frame[0] == 10 # strike
-    point += 30
-  elsif frame.sum == 10 # spare
-    point += frame[0] + 10
+while index < shots.length && frames.length < 10
+  if shots[index] == 10
+    frames << [10]
+    index += 1
   else
-    point += frame.sum
+    frames << [shots[index], shots[index + 1]]
+    index += 2
   end
 end
-puts point
+
+puts frames.inspect
