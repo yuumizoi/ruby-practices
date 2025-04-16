@@ -27,4 +27,31 @@ while index < shots.length && frames.length < 10
   end
 end
 
-puts frames.inspect
+point = 0 # point の初期化
+
+frames.each_with_index do |frame, i|
+  if frame[0] == 10
+    if frames[i][0] == 10
+      point += 10
+      if i + 1 < frames.length
+        point += frames[i + 1][0]
+        if frames[i + 1][0] != 10
+          point += frames[i + 1][1]
+        else
+          if i + 2 < frames.length
+            point += frames[i + 2][0]
+          end
+        end
+      end
+    end
+  elsif [(frame[0][0]) + (frame[0][1])] == 10  # ここにスペアの条件を書く
+    # スペアのスコア計算
+  else
+    if frames[i][0] + frames[i][1] < 10
+      point += frames[i][0] + frames[i][1]
+    end
+    
+  end
+end
+
+puts point
