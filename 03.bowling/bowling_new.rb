@@ -30,27 +30,27 @@ end
 point = 0 # point の初期化
 
 frames.each_with_index do |frame, i|
-  if frame[0] == 10
-    if frames[i][0] == 10
+  if i <= 8 #1〜9フレームの処理
+    if frames[i + 1][0] == 10
       point += 10
-      if i + 1 < frames.length
-        point += frames[i + 1][0]
-        if frames[i + 1][0] != 10
-          point += frames[i + 1][1]
-        else
-          if i + 2 < frames.length
-            point += frames[i + 2][0]
-          end
-        end
+      if frames[i + 1][0] == 10 # 2フレーム目がストライク
+        point += 10 + frames[i + 1][0] + frames[i + 2][0]
+      else # 2フレーム目がストライクじゃない
+        point += 10 + frames[i + 1][0] + frames[i + 1][1]
       end
-    end
-  elsif [(frame[0][0]) + (frame[0][1])] == 10  # ここにスペアの条件を書く
-    # スペアのスコア計算
-  else
-    if frames[i][0] + frames[i][1] < 10
+    elsif frames[i][0] + frames[i][1] == 10 # スペアの処理
+      point += 10 + frames[i + 1][0]
+    else
       point += frames[i][0] + frames[i][1]
     end
-    
+  else
+    if frames[9][0] == 10 # → ストライク：3投の加点
+      point += 10 + frames[9][1] + frames[9][2]
+    elsif frames[9][0] + frames[9][1] == 10 # → スペア：3投の加点
+      point += frames[9][0] + frames[9][1] + frames[9][2]
+    else # → 通常フレーム：2投の加点
+      point += frames[9][0] + frames[9][1]
+    end
   end
 end
 
