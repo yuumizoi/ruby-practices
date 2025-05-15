@@ -26,14 +26,11 @@ point = 0 # point の初期化
 
 frames.size.times do |i|
   point += frames[i].sum # 基本点
-  next if i == 9
+  next if i == 9 || frames[i].sum != 10 # 10フレーム目 or 通常フレーム（10点未満）の場合はスキップ
 
+  point += frames[i + 1][0]
   if frames[i][0] == 10
-    point += frames[i + 1][0]
     point += frames[i + 1][1] || frames[i + 2][0]
-  elsif frames[i].sum == 10
-    point += frames[i + 1][0]
   end
 end
-
 puts point
