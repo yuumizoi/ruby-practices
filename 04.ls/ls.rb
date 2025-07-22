@@ -5,7 +5,9 @@ def calc_max_width(file_names)
 end
 
 def fetch_visiable_files
-    Dir.entries('.').reject { |name| name.start_with?('.') }
+    Dir.entries('.')
+    .reject { |name| name.start_with?('.') }
+    .sort
 end
 
 def display_files(file_names, width)
