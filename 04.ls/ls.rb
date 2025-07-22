@@ -18,7 +18,6 @@ def display_files(file_names, width)
     file_names += [""] * padding_count
 
     row_count.times do |row_index|
-        # puts row_index
         row = []
         COLUMN_COUNT.times do |col_index|
             index = row_index + row_count * col_index
@@ -28,7 +27,6 @@ def display_files(file_names, width)
     end
 end
 
-# ▼ ›動作確認用テストコード（開発後に削除予定）
 file_names = fetch_visiable_files
 width = calc_max_width(file_names)
 display_files(file_names, width)
