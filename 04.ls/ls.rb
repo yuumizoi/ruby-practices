@@ -18,7 +18,14 @@ def display_files(file_names, width)
     puts "ファイル数： #{file_names.size.to_f}"
     puts "必要な行数： #{row_count}"
 
-    # 右詰め1列表示
+    # 不足分を空文字で埋め、3列分のマス目を満たす
+    padding_count = row_count * COLUMN_COUNT - file_names.size
+    file_names += [""] * padding_count
+
+    # 追加された空文字が何個かを表示
+    puts "追加された空文字の数: #{padding_count}"
+
+    # 右詰め1列表示（整形前）
     file_names.each { |name| puts name.rjust(width) }
 end
 
