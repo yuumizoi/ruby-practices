@@ -12,7 +12,7 @@ end
 
 def display_files(file_names, width)
   # 行数を計算
-  row_count = (file_names.size.to_f / COLUMN_COUNT).ceil
+  row_count = file_names.size.ceildiv(COLUMN_COUNT)
   # 不足分を空文字で埋め、3列分のマス目を満たす
   padding_count = row_count * COLUMN_COUNT - file_names.size
   file_names += [''] * padding_count
