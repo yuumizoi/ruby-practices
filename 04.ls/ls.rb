@@ -18,10 +18,9 @@ def display_files(file_names, width)
   file_names += [''] * padding_count
 
   row_count.times do |row_index|
-    row = []
-    COLUMN_COUNT.times do |col_index|
+    row = COLUMN_COUNT.times.map do |col_index|
       index = row_index + row_count * col_index
-      row << file_names[index].ljust(width)
+      file_names[index].ljust(width)
     end
     puts row.join('  ')
   end
