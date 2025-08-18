@@ -6,10 +6,8 @@ def calc_max_width(file_names)
   file_names.map(&:size).max
 end
 
-def fetch_visiable_files
-  Dir.entries('.')
-     .reject { |name| name.start_with?('.') }
-     .sort
+def fetch_visible_files
+  Dir.glob('*').sort
 end
 
 def display_files(file_names, width)
@@ -29,6 +27,6 @@ def display_files(file_names, width)
   end
 end
 
-file_names = fetch_visiable_files
+file_names = fetch_visible_files
 width = calc_max_width(file_names)
 display_files(file_names, width)
