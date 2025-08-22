@@ -12,8 +12,13 @@ def calc_max_width(file_names)
   file_names.map(&:size).max
 end
 
-def fetch_visible_files
-  Dir.glob('*').sort
+def fetch_visible_files(all:)
+  if all
+    entries = Dir.entries('.')
+  else
+    entries.glob('*')
+  end
+    entries.sort
 end
 
 def display_files(file_names, width)
@@ -32,6 +37,6 @@ def display_files(file_names, width)
   end
 end
 
-file_names = fetch_visible_files
+file_names = fetch_visible_files(all: ProgramConfig.key?(:a))
 width = calc_max_width(file_names)
 display_files(file_names, width)
