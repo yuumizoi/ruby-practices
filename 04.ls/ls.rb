@@ -1,4 +1,10 @@
 # frozen_string_literal: true
+require "optparse"
+
+ProgramConfig = {}
+opts = OptionParser.new
+opts.on('-a') { ProgramConfig[:a] = true }
+opts.parse!(ARGV)
 
 COLUMN_COUNT = 3
 
