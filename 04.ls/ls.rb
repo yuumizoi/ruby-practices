@@ -1,9 +1,11 @@
 # frozen_string_literal: true
-require "optparse"
 
-ProgramConfig = {}
+require 'optparse'
+
+# PROGRAM_CONFIG = {}.freeze
+all = false
 opts = OptionParser.new
-opts.on('-a') { ProgramConfig[:a] = true }
+opts.on('-a') { all = true }
 opts.parse!(ARGV)
 
 COLUMN_COUNT = 3
@@ -13,12 +15,12 @@ def calc_max_width(file_names)
 end
 
 def fetch_visible_files(all:)
-  if all
-    entries = Dir.entries('.')
-  else
-    entries.glob('*')
-  end
-    entries.sort
+  entries = if all
+              Dir.entries('.')
+            else
+              Dir.glob('*')
+            end
+  entries.sort
 end
 
 def display_files(file_names, width)
@@ -37,6 +39,6 @@ def display_files(file_names, width)
   end
 end
 
-file_names = fetch_visible_files(all: ProgramConfig.key?(:a))
+file_names = fetch_visible_files(all: all)
 width = calc_max_width(file_names)
 display_files(file_names, width)
