@@ -2,7 +2,6 @@
 
 require 'optparse'
 
-# PROGRAM_CONFIG = {}.freeze
 all = false
 opts = OptionParser.new
 opts.on('-a') { all = true }
@@ -15,12 +14,7 @@ def calc_max_width(file_names)
 end
 
 def fetch_visible_files(all:)
-  entries = if all
-              Dir.entries('.')
-            else
-              Dir.glob('*')
-            end
-  entries.sort
+  (all ? Dir.entries('.') : Dir.glob('*')).sort
 end
 
 def display_files(file_names, width)
