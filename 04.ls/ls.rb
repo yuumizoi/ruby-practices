@@ -30,7 +30,8 @@ def display_files(file_names, width)
   row_count.times do |row_index|
     row = Array.new(COLUMN_COUNT) do |col_index|
       index = row_index + row_count * col_index
-      file_names[index].ljust(width)
+      name = file_names[index]
+      col_index == COLUMN_COUNT - 1 ? name : name.ljust(width)
     end
     puts row.join('  ')
   end
