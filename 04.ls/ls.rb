@@ -3,8 +3,11 @@
 require 'optparse'
 
 all = false
+reverse = false
+
 opts = OptionParser.new
 opts.on('-a') { all = true }
+opts.on('-r') { reverse = true }
 opts.parse!(ARGV)
 
 COLUMN_COUNT = 3
