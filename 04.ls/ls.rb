@@ -33,6 +33,6 @@ def display_files(file_names, width)
   end
 end
 
-file_names = fetch_visible_files(all: all)
+file_names = fetch_visible_files(all:)
 width = calc_max_width(file_names)
 display_files(file_names, width)
