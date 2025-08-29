@@ -1,13 +1,21 @@
 # frozen_string_literal: true
 
+require 'optparse'
+
+all = false
+opts = OptionParser.new
+opts.on('-a') { all = true }
+opts.parse!(ARGV)
+
 COLUMN_COUNT = 3
 
 def calc_max_width(file_names)
   file_names.map(&:size).max
 end
 
-def fetch_visible_files
-  Dir.glob('*').sort
+def fetch_visible_files(all:)
+  flags = all ? File::FNM_DOTMATCH : 0
+  Dir.glob('*', flags).sort
 end
 
 def display_files(file_names, width)
@@ -26,6 +34,6 @@ def display_files(file_names, width)
   end
 end
 
-file_names = fetch_visible_files
+file_names = fetch_visible_files(all:)
 width = calc_max_width(file_names)
 display_files(file_names, width)
