@@ -17,7 +17,8 @@ def calc_max_width(file_names)
 end
 
 def fetch_visible_files(all:)
-  (all ? Dir.entries('.') : Dir.glob('*')).sort
+  flags = all ? File::FNM_DOTMATCH : 0
+  Dir.glob('*', flags).sort
 end
 
 def display_files(file_names, width)
@@ -37,7 +38,7 @@ def display_files(file_names, width)
   end
 end
 
-file_names = fetch_visible_files(all: all)
+file_names = fetch_visible_files(all:)
 file_names.reverse! if reverse
 width = calc_max_width(file_names)
 display_files(file_names, width)
