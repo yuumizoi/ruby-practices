@@ -36,9 +36,10 @@ file_names = fetch_visible_files
 if long
   stats = file_names.map { |n| [n, File.lstat(n)] }
   link_count_width = [1, *stats.map { |_, st| st.nlink.to_s.size }].max
-  stats.each { |name, st| puts "#{st.nlink.to_s.rjust(link_count_width)} #{name}" }
-
-  # user_name_width = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
+  user_name_width = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
+  stats.each do |name, st|
+    printf "%#{link_count_width}d %-#{user_name_width}s %s\n", st.nlink, (Etc.getpwuid(st.uid)&.name || st.uid.to_s), name
+  end
   # group_name_width = [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max
   # file_size_width = [1, *stats.map { |_, st| st.size.to_s.size }].max
   # いったん動作確認として、-l は1行=1ファイルの暫定表示
