@@ -39,12 +39,19 @@ if long
   user_name_width = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
   group_name_width = [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max
   file_size_width = [1, *stats.map { |_, st| st.size.to_s.size }].max
+  mtime_width = [1, *stats.map { |_, st| st.mtime.strftime('%Y-%m-%d %H:%M').size }].max
 
   stats.each do |name, st|
     user = Etc.getpwuid(st.uid)&.name || st.uid.to_s
     group = Etc.getgrgid(st.gid)&.name || st.gid.to_s
-    printf "%#{link_count_width}d %-#{user_name_width}s %-#{group_name_width}s %#{file_size_width}d %s\n",
-           st.nlink, user, group, st.size, name
+    mtime = st.mtime.strftime('%Y-%m-%d %H:%M')
+    printf "%#{link_count_width}d %-#{user_name_width}s %-#{group_name_width}s %#{file_size_width}d %-#{mtime_width}s %s\n",
+           st.nlink,
+           user,
+           group,
+           st.size,
+           mtime,
+           name
   end
 else
   width = calc_max_width(file_names)
