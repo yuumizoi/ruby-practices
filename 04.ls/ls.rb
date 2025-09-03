@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'optparse' # ← 追加：-l を受け取るため
+require 'etc' # ← 追加 : ユーザー/グループ名の取得に使用
+
 COLUMN_COUNT = 3
 
 def calc_max_width(file_names)
@@ -26,6 +29,21 @@ def display_files(file_names, width)
   end
 end
 
+long = false
+OptionParser.new { |opt| opt.on('-l') { long = true } }.parse!(ARGV)
+
 file_names = fetch_visible_files
-width = calc_max_width(file_names)
-display_files(file_names, width)
+if long
+  stats = file_names.map { |n| [n, File.lstat(n)] }
+  link_count_width = [1, *stats.map { |_, st| st.nlink.to_s.size }].max
+  stats.each { |name, st| puts "#{st.nlink.to_s.rjust(link_count_width)} #{name}" }
+
+  # user_name_width = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
+  # group_name_width = [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max
+  # file_size_width = [1, *stats.map { |_, st| st.size.to_s.size }].max
+  # いったん動作確認として、-l は1行=1ファイルの暫定表示
+  file_names.each { |name| puts name }
+else
+  width = calc_max_width(file_names)
+  display_files(file_names, width)
+end
