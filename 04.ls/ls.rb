@@ -35,6 +35,9 @@ OptionParser.new { |opt| opt.on('-l') { long = true } }.parse!(ARGV)
 file_names = fetch_visible_files
 if long
   stats = file_names.map { |n| [n, File.lstat(n)] }
+  total_blocks = stats.sum { |_, st| st.blocks || ((st.size + 511) / 512) }
+  puts "total #{total_blocks}"
+
   link_count_width = [1, *stats.map { |_, st| st.nlink.to_s.size }].max
   user_name_width = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
   group_name_width = [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max
