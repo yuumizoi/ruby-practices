@@ -44,14 +44,29 @@ if long
   stats.each do |name, st|
     user = Etc.getpwuid(st.uid)&.name || st.uid.to_s
     group = Etc.getgrgid(st.gid)&.name || st.gid.to_s
+    # 種別＋rwx
+    type_char = case st.ftype
+                when 'directory' then 'd'
+                when 'link' then 'l'
+                when 'characterSpecial' then 'c'
+                when 'blockSpecial' then 'b'
+                when 'socket' then 's'
+                when 'fifo' then 'p'
+                when 'file' then '-'
+                else '?'
+                end
+
+    m = st.mode & 0o777
+    perms = [
+      (m & 0o400).zero? ? '-' : 'r', (m & 0o200).zero? ? '-' : 'w', (m & 0o100).zero? ? '-' : 'x',
+      (m & 0o040).zero? ? '-' : 'r', (m & 0o020).zero? ? '-' : 'w', (m & 0o010).zero? ? '-' : 'x',
+      (m & 0o004).zero? ? '-' : 'r', (m & 0o002).zero? ? '-' : 'w', (m & 0o001).zero? ? '-' : 'x'
+    ].join
+    permstr = type_char + perms
+
     mtime = st.mtime.strftime('%Y-%m-%d %H:%M')
-    printf "%#{link_count_width}d %-#{user_name_width}s %-#{group_name_width}s %#{file_size_width}d %-#{mtime_width}s %s\n",
-           st.nlink,
-           user,
-           group,
-           st.size,
-           mtime,
-           name
+    printf "%-10s %#{link_count_width}d %-#{user_name_width}s %-#{group_name_width}s %#{file_size_width}d %-#{mtime_width}s %s\n",
+           permstr, st.nlink, user, group, st.size, mtime, name
   end
 else
   width = calc_max_width(file_names)
