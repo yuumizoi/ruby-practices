@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require 'optparse' # ← 追加：-l を受け取るため
-require 'etc' # ← 追加 : ユーザー/グループ名の取得に使用
+require 'optparse'
+require 'etc'
+require 'shellwords'
 
 COLUMN_COUNT = 3
 
@@ -67,8 +68,17 @@ if long
     ].join
     permstr = type_char + perms
 
+    # 拡張属性が付いている場合は @ を追加（macOS）
+    begin
+      xattr_output = `xattr -l -- #{Shellwords.escape(name)} 2>/dev/null`
+      has_xattr = !xattr_output.strip.empty?
+    rescue StandardError
+      has_xattr = false
+    end
+    permstr += '@' if has_xattr
+
     mtime = st.mtime.strftime('%Y-%m-%d %H:%M')
-    printf "%-10s %#{link_count_width}d %-#{user_name_width}s %-#{group_name_width}s %#{file_size_width}d %-#{mtime_width}s %s\n",
+    printf "%-11s %#{link_count_width}d %-#{user_name_width}s  %-#{group_name_width}s  %#{file_size_width}d  %-#{mtime_width}s %s\n",
            permstr, st.nlink, user, group, st.size, mtime, name
   end
 else
