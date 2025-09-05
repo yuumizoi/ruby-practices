@@ -30,6 +30,29 @@ def display_files(file_names, width)
   end
 end
 
+def file_type_char(stat)
+  case stat.ftype
+  when 'directory' then 'd'
+  when 'link' then 'l'
+  when 'characterSpecial' then 'c'
+  when 'blockSpecial' then 'b'
+  when 'socket' then 's'
+  when 'fifo' then 'p'
+  when 'file' then '-'
+  else '?'
+  end
+end
+
+def format_mtime_for_ls(time, now = Time.now)
+  six_months   = 60 * 60 * 24 * 30 * 6
+  future_slack = 60 * 60
+  if (now - time).abs <= six_months || (time - now) <= future_slack
+    time.strftime('%-m %e %H:%M')
+  else
+    time.strftime('%-m %e  %Y')
+  end
+end
+
 long = false
 OptionParser.new { |opt| opt.on('-l') { long = true } }.parse!(ARGV)
 
@@ -43,22 +66,13 @@ if long
   user_name_width = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
   group_name_width = [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max
   file_size_width = [1, *stats.map { |_, st| st.size.to_s.size }].max
-  mtime_width = [1, *stats.map { |_, st| st.mtime.strftime('%Y-%m-%d %H:%M').size }].max
+  mtime_width = [1, *stats.map { |_, st| format_mtime_for_ls(st.mtime).size }].max
 
   stats.each do |name, st|
     user = Etc.getpwuid(st.uid)&.name || st.uid.to_s
     group = Etc.getgrgid(st.gid)&.name || st.gid.to_s
-    # 種別＋rwx
-    type_char = case st.ftype
-                when 'directory' then 'd'
-                when 'link' then 'l'
-                when 'characterSpecial' then 'c'
-                when 'blockSpecial' then 'b'
-                when 'socket' then 's'
-                when 'fifo' then 'p'
-                when 'file' then '-'
-                else '?'
-                end
+
+    type_char = file_type_char(st)
 
     m = st.mode & 0o777
     perms = [
@@ -77,7 +91,7 @@ if long
     end
     permstr += '@' if has_xattr
 
-    mtime = st.mtime.strftime('%Y-%m-%d %H:%M')
+    mtime = format_mtime_for_ls(st.mtime)
     printf "%-11s %#{link_count_width}d %-#{user_name_width}s  %-#{group_name_width}s  %#{file_size_width}d  %-#{mtime_width}s %s\n",
            permstr, st.nlink, user, group, st.size, mtime, name
   end
