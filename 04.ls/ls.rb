@@ -44,14 +44,8 @@ def file_type_char(stat)
   end
 end
 
-def format_mtime_for_ls(time, now = Time.now)
-  six_months   = 60 * 60 * 24 * 30 * 6
-  future_slack = 60 * 60
-  if (now - time).abs <= six_months || (time - now) <= future_slack
-    time.strftime('%-m %e %H:%M')
-  else
-    time.strftime('%-m %e  %Y')
-  end
+def format_mtime_for_ls(time, _now = Time.now)
+  time.strftime('%-m %e %H:%M')
 end
 
 # ---- options ----
