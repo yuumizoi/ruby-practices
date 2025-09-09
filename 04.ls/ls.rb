@@ -67,12 +67,13 @@ if long
   stats = file_names.map { |n| [n, File.lstat(n)] }
   total_blocks = stats.sum { |_, st| st.blocks || ((st.size + 511) / 512) }
   puts "total #{total_blocks}"
-
-  link_count_width = [1, *stats.map { |_, st| st.nlink.to_s.size }].max
-  user_name_width  = [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max
-  group_name_width = [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max
-  file_size_width  = [1, *stats.map { |_, st| st.size.to_s.size }].max
-  mtime_width      = [1, *stats.map { |_, st| format_mtime_for_ls(st.mtime).size }].max
+  widths = {
+    link: [1, *stats.map { |_, st| st.nlink.to_s.size }].max,
+    user: [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max,
+    group: [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max,
+    size: [1, *stats.map { |_, st| st.size.to_s.size }].max,
+    mtime: [1, *stats.map { |_, st| format_mtime_for_ls(st.mtime).size }].max
+  }
 
   stats.each do |name, st|
     user  = Etc.getpwuid(st.uid)&.name || st.uid.to_s
@@ -98,7 +99,7 @@ if long
     permstr += '@' if has_xattr
 
     mtime = format_mtime_for_ls(st.mtime)
-    printf "%-11s %#{link_count_width}d %-#{user_name_width}s  %-#{group_name_width}s  %#{file_size_width}d  %-#{mtime_width}s %s\n",
+    printf "%-11s %#{widths[:link]}d %-#{widths[:user]}s  %-#{widths[:group]}s  %#{widths[:size]}d  %-#{widths[:mtime]}s %s\n",
            permstr, st.nlink, user, group, st.size, mtime, name
   end
 else
