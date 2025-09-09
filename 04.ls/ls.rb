@@ -6,6 +6,20 @@ require 'shellwords'
 
 COLUMN_COUNT = 3
 
+FTYPE_TO_CHAR = {
+  'directory' => 'd',
+  'link' => 'l',
+  'characterSpecial' => 'c',
+  'blockSpecial' => 'b',
+  'socket' => 's',
+  'fifo' => 'p',
+  'file' => '-'
+}.freeze
+
+def file_type_char(stat)
+  FTYPE_TO_CHAR.fetch(stat.ftype, '?')
+end
+
 def name_column_width(file_names)
   file_names.map(&:size).max || 0
 end
@@ -28,19 +42,6 @@ def display_files(file_names, width)
       file_names[index].ljust(width)
     end
     puts row.join('  ')
-  end
-end
-
-def file_type_char(stat)
-  case stat.ftype
-  when 'directory' then 'd'
-  when 'link' then 'l'
-  when 'characterSpecial' then 'c'
-  when 'blockSpecial' then 'b'
-  when 'socket' then 's'
-  when 'fifo' then 'p'
-  when 'file' then '-'
-  else '?'
   end
 end
 
