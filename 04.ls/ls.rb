@@ -65,7 +65,7 @@ file_names.reverse! if reverse
 # ---- output ----
 if long
   stats = file_names.map { |n| [n, File.lstat(n)] }
-  total_blocks = stats.sum { |_, st| st.blocks || ((st.size + 511) / 512) }
+  total_blocks = stats.sum { |_, st| st.blocks.nil? ? ((st.size + 511) / 512) : st.blocks }
   puts "total #{total_blocks}"
   widths = {
     link: [1, *stats.map { |_, st| st.nlink.to_s.size }].max,
