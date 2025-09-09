@@ -7,7 +7,7 @@ require 'shellwords'
 COLUMN_COUNT = 3
 
 def name_column_width(file_names)
-  file_names.map(&:size).max
+  file_names.map(&:size).max || 0
 end
 
 def fetch_visible_files(all:)
@@ -48,50 +48,72 @@ def format_mtime_for_ls(time, _now = Time.now)
   time.strftime('%-m %e %H:%M')
 end
 
-def print_output(file_names, long)
-  if long
-    stats = file_names.map { |n| [n, File.lstat(n)] }
-    total_blocks = stats.sum { |_, st| st.blocks.nil? ? ((st.size + 511) / 512) : st.blocks }
-    puts "total #{total_blocks}"
-    return if stats.empty?
-    
-    widths = {
-      link: [1, *stats.map { |_, st| st.nlink.to_s.size }].max,
-      user: [1, *stats.map { |_, st| (Etc.getpwuid(st.uid)&.name || st.uid.to_s).size }].max,
-      group: [1, *stats.map { |_, st| (Etc.getgrgid(st.gid)&.name || st.gid.to_s).size }].max,
-      size: [1, *stats.map { |_, st| st.size.to_s.size }].max,
-      mtime: [1, *stats.map { |_, st| format_mtime_for_ls(st.mtime).size }].max
-    }
-    
-    stats.each do |name, st|
-      user  = Etc.getpwuid(st.uid)&.name || st.uid.to_s
-      group = Etc.getgrgid(st.gid)&.name || st.gid.to_s
+def max_width(stats, &block)
+  [1, *stats.map(&block)].max
+end
 
-      type_char = file_type_char(st)
-      m = st.mode & 0o777
-      perms = [
-        (m & 0o400).zero? ? '-' : 'r', (m & 0o200).zero? ? '-' : 'w', (m & 0o100).zero? ? '-' : 'x',
-        (m & 0o040).zero? ? '-' : 'r', (m & 0o020).zero? ? '-' : 'w', (m & 0o010).zero? ? '-' : 'x',
-        (m & 0o004).zero? ? '-' : 'r', (m & 0o002).zero? ? '-' : 'w', (m & 0o001).zero? ? '-' : 'x'
-      ].join
-      permstr = type_char + perms
-  
-      # 拡張属性が付いている場合は @ を追加（macOS）
-      begin
-        xattr_output = `xattr -l -- #{Shellwords.escape(name)} 2>/dev/null`
-        has_xattr = !xattr_output.strip.empty?
-      rescue StandardError
-        has_xattr = false
-      end
-      permstr += '@' if has_xattr
-  
-      mtime = format_mtime_for_ls(st.mtime)
-      printf "%-11s %#{widths[:link]}d %-#{widths[:user]}s  %-#{widths[:group]}s  %#{widths[:size]}d  %-#{widths[:mtime]}s %s\n",
-              permstr, st.nlink, user, group, st.size, mtime, name
-    end
-  else
-    width = name_column_width(file_names)
-    display_files(file_names, width)
+def compute_widths(stats)
+  {
+    link: max_width(stats) { |_, s| s.nlink.to_s.size },
+    user: max_width(stats) { |_, s| (Etc.getpwuid(s.uid)&.name || s.uid.to_s).size },
+    group: max_width(stats) { |_, s| (Etc.getgrgid(s.gid)&.name || s.gid.to_s).size },
+    size: max_width(stats) { |_, s| s.size.to_s.size },
+    mtime: max_width(stats) { |_, s| format_mtime_for_ls(s.mtime).size }
+  }
+end
+
+def compute_total_blocks(stats)
+  stats.sum { |_, st| st.blocks.nil? ? ((st.size + 511) / 512) : st.blocks }
+end
+
+def xattr?(name)
+  xattr_output = `xattr -l -- #{Shellwords.escape(name)} 2>/dev/null`
+  !xattr_output.strip.empty?
+rescue StandardError
+  false
+end
+
+def permissions_str(stat)
+  m = stat.mode & 0o777
+  [
+    rwx_char(m, 0o400, 'r'), rwx_char(m, 0o200, 'w'), rwx_char(m, 0o100, 'x'),
+    rwx_char(m, 0o040, 'r'), rwx_char(m, 0o020, 'w'), rwx_char(m, 0o010, 'x'),
+    rwx_char(m, 0o004, 'r'), rwx_char(m, 0o002, 'w'), rwx_char(m, 0o001, 'x')
+  ].join
+end
+
+def rwx_char(mode, mask, char)
+  (mode & mask).zero? ? '-' : char
+end
+
+def build_permstr(stat, name)
+  permstr = file_type_char(stat) + permissions_str(stat)
+  permstr += '@' if xattr?(name)
+  permstr
+end
+
+def print_output(file_names, long)
+  return print_long_listing(file_names) if long
+
+  width = name_column_width(file_names)
+  display_files(file_names, width)
+end
+
+def print_long_listing(file_names)
+  stats = file_names.map { |n| [n, File.lstat(n)] }
+  puts "total #{compute_total_blocks(stats)}"
+  return if stats.empty?
+
+  widths = compute_widths(stats)
+  stats.each do |name, st|
+    user  = Etc.getpwuid(st.uid)&.name || st.uid.to_s
+    group = Etc.getgrgid(st.gid)&.name || st.gid.to_s
+    permstr = build_permstr(st, name)
+    mtime = format_mtime_for_ls(st.mtime)
+    printf(
+      "%-11s %#{widths[:link]}d %-#{widths[:user]}s  %-#{widths[:group]}s  %#{widths[:size]}d  %-#{widths[:mtime]}s %s\n",
+      permstr, st.nlink, user, group, st.size, mtime, name
+    )
   end
 end
 
