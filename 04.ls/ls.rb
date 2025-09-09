@@ -6,7 +6,7 @@ require 'shellwords'
 
 COLUMN_COUNT = 3
 
-def calc_max_width(file_names)
+def name_column_width(file_names)
   file_names.map(&:size).max
 end
 
@@ -59,7 +59,7 @@ OptionParser.new do |opt|
 end.parse!(ARGV)
 
 # ---- files ----
-file_names = fetch_visible_files(all: all)
+file_names = fetch_visible_files(all:)
 file_names.reverse! if reverse
 
 # ---- output ----
@@ -102,6 +102,6 @@ if long
            permstr, st.nlink, user, group, st.size, mtime, name
   end
 else
-  width = calc_max_width(file_names)
+  width = name_column_width(file_names)
   display_files(file_names, width)
 end
