@@ -53,16 +53,32 @@ def max_width(values)
   values.map { |v| v.to_s.size }.max
 end
 
+def stat_list(stats)
+  stats.map { |_, s| s }
+end
+
+def user_names_of(file_stats)
+  file_stats.map { |s| Etc.getpwuid(s.uid)&.name || s.uid.to_s }
+end
+
+def group_names_of(file_stats)
+  file_stats.map { |s| Etc.getgrgid(s.gid)&.name || s.gid.to_s }
+end
+
+def mtime_strings_of(file_stats)
+  file_stats.map { |s| format_mtime_for_ls(s.mtime) }
+end
+
 def compute_widths(stats)
-  file_stats = stats.map { |_, s| s }
-  users  = file_stats.map { |s| Etc.getpwuid(s.uid)&.name || s.uid.to_s }
-  groups = file_stats.map { |s| Etc.getgrgid(s.gid)&.name || s.gid.to_s }
+  file_stats = stat_list(stats)
+  users  = user_names_of(file_stats)
+  groups = group_names_of(file_stats)
   {
-    link:  max_width(file_stats.map(&:nlink)),
-    user:  max_width(users),
+    link: max_width(file_stats.map(&:nlink)),
+    user: max_width(users),
     group: max_width(groups),
-    size:  max_width(file_stats.map(&:size)),
-    mtime: max_width(file_stats.map { |s| format_mtime_for_ls(s.mtime) })
+    size: max_width(file_stats.map(&:size)),
+    mtime: max_width(mtime_strings_of(file_stats))
   }
 end
 
@@ -107,16 +123,18 @@ def print_long_listing(file_names)
   return if stats.empty?
 
   widths = compute_widths(stats)
-  stats.each do |name, st|
-    user  = Etc.getpwuid(st.uid)&.name || st.uid.to_s
-    group = Etc.getgrgid(st.gid)&.name || st.gid.to_s
-    permstr = build_permstr(st, name)
-    mtime = format_mtime_for_ls(st.mtime)
-    printf(
-      "%-11s %#{widths[:link]}d %-#{widths[:user]}s  %-#{widths[:group]}s  %#{widths[:size]}d  %-#{widths[:mtime]}s %s\n",
-      permstr, st.nlink, user, group, st.size, mtime, name
-    )
-  end
+  stats.each { |name, st| print_long_row(name, st, widths) }
+end
+
+def print_long_row(name, stat, widths)
+  user   = Etc.getpwuid(stat.uid)&.name || stat.uid.to_s
+  group  = Etc.getgrgid(stat.gid)&.name || stat.gid.to_s
+  permstr = build_permstr(stat, name)
+  mtime   = format_mtime_for_ls(stat.mtime)
+  printf(
+    "%-11s %#{widths[:link]}d %-#{widths[:user]}s  %-#{widths[:group]}s  %#{widths[:size]}d  %-#{widths[:mtime]}s %s\n",
+    permstr, stat.nlink, user, group, stat.size, mtime, name
+  )
 end
 
 # ---- options ----
