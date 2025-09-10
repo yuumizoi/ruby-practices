@@ -34,12 +34,12 @@ def display_files(file_names, width)
   row_count = file_names.size.ceildiv(COLUMN_COUNT)
   # 不足分を空文字で埋め、3列分のマス目を満たす
   padding_count = row_count * COLUMN_COUNT - file_names.size
-  file_names += [''] * padding_count
+  padded = file_names + ([''] * padding_count)
 
   row_count.times do |row_index|
     row = Array.new(COLUMN_COUNT) do |col_index|
       index = row_index + row_count * col_index
-      file_names[index].ljust(width)
+      padded[index].ljust(width)
     end
     puts row.join('  ')
   end
@@ -118,7 +118,7 @@ end
 
 def print_long_listing(file_names)
   stats = file_names.map { |n| [n, File.lstat(n)] }
-  file_stats = stats.map { |_, st| st }
+  file_stats = stat_list(stats)
   puts "total #{compute_total_blocks(file_stats)}"
   return if stats.empty?
 
