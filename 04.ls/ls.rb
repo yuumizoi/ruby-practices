@@ -21,7 +21,7 @@ def file_type_char(stat)
 end
 
 def name_column_width(file_names)
-  file_names.map(&:size).max || 0
+  file_names.map(&:size).max
 end
 
 def fetch_visible_files(all:)
@@ -90,7 +90,9 @@ def build_permstr(stat, name)
 end
 
 def print_output(file_names, long)
-  return print_long_listing(file_names) if long
+# 非 -l で一覧が空なら何も出力しない
+return if !long && file_names.empty?
+return print_long_listing(file_names) if long
 
   width = name_column_width(file_names)
   display_files(file_names, width)
