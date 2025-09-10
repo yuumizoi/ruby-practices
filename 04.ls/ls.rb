@@ -63,8 +63,8 @@ def compute_widths(stats)
   }
 end
 
-def compute_total_blocks(stats)
-  stats.sum { |_, st| st.blocks.nil? ? ((st.size + 511) / 512) : st.blocks }
+def compute_total_blocks(file_stats)
+  file_stats.sum { |st| st.blocks || ((st.size + 511) / 512) }
 end
 
 def xattr?(name)
@@ -76,11 +76,7 @@ end
 
 def permissions_str(stat)
   m = stat.mode & 0o777
-  [
-    rwx_char(m, 0o400, 'r'), rwx_char(m, 0o200, 'w'), rwx_char(m, 0o100, 'x'),
-    rwx_char(m, 0o040, 'r'), rwx_char(m, 0o020, 'w'), rwx_char(m, 0o010, 'x'),
-    rwx_char(m, 0o004, 'r'), rwx_char(m, 0o002, 'w'), rwx_char(m, 0o001, 'x')
-  ].join
+  (0..8).map { |i| rwx_char(m, 0o400 >> i, 'rwx'[i % 3]) }.join
 end
 
 def rwx_char(mode, mask, char)
@@ -102,7 +98,8 @@ end
 
 def print_long_listing(file_names)
   stats = file_names.map { |n| [n, File.lstat(n)] }
-  puts "total #{compute_total_blocks(stats)}"
+  file_stats = stats.map { |_, st| st }
+  puts "total #{compute_total_blocks(file_stats)}"
   return if stats.empty?
 
   widths = compute_widths(stats)
