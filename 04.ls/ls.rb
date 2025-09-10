@@ -49,19 +49,22 @@ def format_mtime_for_ls(time, _now = Time.now)
   time.strftime('%-m %e %H:%M')
 end
 
-def max_width(stats, &block)
-  [1, *stats.map(&block)].max
+def max_width(values)
+  values.map { |v| v.to_s.size }.max
 end
 
 def compute_widths(stats)
+  file_stats = stats.map { |_, s| s }
+  users  = file_stats.map { |s| Etc.getpwuid(s.uid)&.name || s.uid.to_s }
+  groups = file_stats.map { |s| Etc.getgrgid(s.gid)&.name || s.gid.to_s }
   {
-    link: max_width(stats) { |_, s| s.nlink.to_s.size },
-    user: max_width(stats) { |_, s| (Etc.getpwuid(s.uid)&.name || s.uid.to_s).size },
-    group: max_width(stats) { |_, s| (Etc.getgrgid(s.gid)&.name || s.gid.to_s).size },
-    size: max_width(stats) { |_, s| s.size.to_s.size },
-    mtime: max_width(stats) { |_, s| format_mtime_for_ls(s.mtime).size }
+    link:  max_width(file_stats.map(&:nlink)),
+    user:  max_width(users),
+    group: max_width(groups),
+    size:  max_width(file_stats.map(&:size)),
+    mtime: max_width(file_stats.map { |s| format_mtime_for_ls(s.mtime) })
   }
-end
+  end
 
 def compute_total_blocks(file_stats)
   file_stats.sum { |st| st.blocks || ((st.size + 511) / 512) }
