@@ -64,7 +64,7 @@ def compute_widths(stats)
     size:  max_width(file_stats.map(&:size)),
     mtime: max_width(file_stats.map { |s| format_mtime_for_ls(s.mtime) })
   }
-  end
+end
 
 def compute_total_blocks(file_stats)
   file_stats.sum { |st| st.blocks || ((st.size + 511) / 512) }
@@ -93,9 +93,8 @@ def build_permstr(stat, name)
 end
 
 def print_output(file_names, long)
-# 非 -l で一覧が空なら何も出力しない
-return if !long && file_names.empty?
-return print_long_listing(file_names) if long
+  return if !long && file_names.empty?
+  return print_long_listing(file_names) if long
 
   width = name_column_width(file_names)
   display_files(file_names, width)
