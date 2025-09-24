@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# wc コマンド（雛形）
-# 次のステップでオプション解釈と入出力処理を加えます。
+require 'optparse'
+
+def parse_options
+    opt = OptionParser.new
+    options = {}
+    opt.on('-l', 'count lines') { options[:l] = true }
+    opt.parse!(ARGV)
+    options
+end
