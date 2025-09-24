@@ -7,6 +7,7 @@ def parse_options
     opt = OptionParser.new
     options = {}
     opt.on('-l', 'count lines') { options[:l] = true }
+    opt.on('-w','count words') { options[:w]=true }
     opt.parse!(ARGV)
     options
 end
@@ -19,4 +20,7 @@ name = nil if pipe_input
 text = File.read(ARGV.first, mode: 'rb') unless pipe_input
 name = ARGV.first unless pipe_input
 lines = text.count("\n")
-puts(name ? "#{lines} #{name}" : lines.to_s)
+words = text.scan(/\S+/).length
+
+puts(name ? "#{lines} #{name}" : lines.to_s) if opts[:l]
+puts(name ? "#{words} #{name}" : words.to_s) if opts[:w]
