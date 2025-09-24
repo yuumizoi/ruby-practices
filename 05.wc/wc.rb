@@ -7,13 +7,14 @@ def parse_options
     opt = OptionParser.new
     options = {}
     opt.on('-l', 'count lines') { options[:l] = true }
-    opt.on('-w','count words') { options[:w] = true }
-    opt.on('-c','count bytes') { options[:c] = true }
+    opt.on('-w', 'count words') { options[:w] = true }
+    opt.on('-c', 'count bytes') { options[:c] = true }
     opt.parse!(ARGV)
     options
 end
 
 opts = parse_options
+opts = { l: true, w: true, c: true } unless opts.values.any?
 pipe_input = ARGV.empty? && !STDIN.tty?
 
 text = STDIN.read if pipe_input
@@ -24,6 +25,5 @@ lines = text.count("\n")
 words = text.scan(/\S+/).length
 bytes = text.bytesize
 
-puts(name ? "#{lines} #{name}" : lines.to_s) if opts[:l]
-puts(name ? "#{words} #{name}" : words.to_s) if opts[:w]
-puts(name ? "#{bytes} #{name}" : bytes.to_s) if opts[:c]
+cols=[]; cols<<lines if opts[:l]; cols<<words if opts[:w]; cols<<bytes if opts[:c]
+puts(name ? "#{cols.join(' ')} #{name}" : cols.join(' '))
