@@ -18,3 +18,5 @@ text = STDIN.read if pipe_input
 name = nil if pipe_input
 text = File.read(ARGV.first, mode: 'rb') unless pipe_input
 name = ARGV.first unless pipe_input
+lines = text.count("\n")
+puts(name ? "#{lines} #{name}" : lines.to_s)
