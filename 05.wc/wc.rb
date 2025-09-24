@@ -10,3 +10,6 @@ def parse_options
     opt.parse!(ARGV)
     options
 end
+
+opts = parse_options
+pipe_input = ARGV.empty? && !STDIN.tty?
