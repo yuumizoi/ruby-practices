@@ -16,9 +16,9 @@ end
 opts = parse_options
 opts = { l: true, w: true, c: true } unless opts.values.any?
 pipe_input = ARGV.empty? && !STDIN.tty?
+rows = []
 
 if pipe_input
-  # --- STDIN：1回だけ処理 ---
   text  = STDIN.read
   lines = text.count("\n")
   words = text.scan(/\S+/).length
@@ -28,9 +28,8 @@ if pipe_input
   cols << lines if opts[:l]
   cols << words if opts[:w]
   cols << bytes if opts[:c]
-  puts cols.join(' ')
+  rows << (cols + [nil])
 else
-  # --- 複数ファイル：各ファイル＋最後に total ---
   total_l = 0
   total_w = 0
   total_c = 0
@@ -49,7 +48,7 @@ else
     cols << l if opts[:l]
     cols << w if opts[:w]
     cols << c if opts[:c]
-    puts "#{cols.join(' ')} #{path}"
+    rows << (cols + [path])
   end
 
   if ARGV.size >= 2
@@ -57,6 +56,6 @@ else
     cols << total_l if opts[:l]
     cols << total_w if opts[:w]
     cols << total_c if opts[:c]
-    puts "#{cols.join(' ')} total"
+    rows << (cols + ['total'])
   end
 end
