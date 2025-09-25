@@ -6,20 +6,20 @@ require 'optparse'
 def parse_options
   opt = OptionParser.new
   options = {}
-  opt.on('-l', 'count lines'){ options[:l] = true }
-  opt.on('-w', 'count words'){ options[:w] = true }
-  opt.on('-c', 'count bytes'){ options[:c] = true }
+  opt.on('-l', 'count lines') { options[:l] = true }
+  opt.on('-w', 'count words') { options[:w] = true }
+  opt.on('-c', 'count bytes') { options[:c] = true }
   opt.parse!(ARGV)
   options
 end
 
 opts = parse_options
 opts = { l: true, w: true, c: true } unless opts.values.any?
-pipe_input = ARGV.empty? && !STDIN.tty?
+pipe_input = ARGV.empty? && !$stdin.tty?
 rows = []
 
 if pipe_input
-  text  = STDIN.read
+  text  = $stdin.read
   lines = text.count("\n")
   words = text.scan(/\S+/).length
   bytes = text.bytesize
@@ -39,7 +39,6 @@ else
     line_count = content.count("\n")
     word_count = content.scan(/\S+/).length
     byte_count = content.bytesize
-
     total_l += line_count
     total_w += word_count
     total_c += byte_count
@@ -60,7 +59,15 @@ else
   end
 end
 
-col_count = [:l, :w, :c].count { |option_key| opts[option_key] }
+col_count = %i[l w c].count { |option_key| opts[option_key] }
 widths = (0...col_count).map { |col_index| rows.map { |row| row[col_index].to_s.length }.max || 0 }
-rows.each { |row| num = (0...col_count).map { |col_index| row[col_index].to_s.rjust(widths[col_index]) }.join(' '); row[col_count] ? (puts "#{num} #{row[col_count]}") : (puts num) }
 
+rows.each do |row|
+  numbers = (0...col_count).map { |col_index| row[col_index].to_s.rjust(widths[col_index]) }
+  num_part = numbers.join(' ')
+  if row[col_count]
+    puts "#{num_part} #{row[col_count]}"
+  else
+    puts num_part
+  end
+end
