@@ -60,11 +60,11 @@ else
 end
 
 col_count = %i[l w c].count { |option_key| opts[option_key] }
-widths = (0...col_count).map { |col_index| rows.map { |row| row[col_index].to_s.length }.max || 0 }
+widths = Array.new(col_count, 8)
 
 rows.each do |row|
   numbers = (0...col_count).map { |col_index| row[col_index].to_s.rjust(widths[col_index]) }
-  num_part = numbers.join(' ')
+  num_part = numbers.join
   if row[col_count]
     puts "#{num_part} #{row[col_count]}"
   else
