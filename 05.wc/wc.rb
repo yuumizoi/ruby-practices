@@ -35,19 +35,19 @@ else
   total_c = 0
 
   ARGV.each do |path|
-    t = File.read(path, mode: 'rb')
-    l = t.count("\n")
-    w = t.scan(/\S+/).length
-    c = t.bytesize
+    content = File.read(path, mode: 'rb')
+    line_count = content.count("\n")
+    word_count = content.scan(/\S+/).length
+    byte_count = content.bytesize
 
-    total_l += l
-    total_w += w
-    total_c += c
+    total_l += line_count
+    total_w += word_count
+    total_c += byte_count
 
     cols = []
-    cols << l if opts[:l]
-    cols << w if opts[:w]
-    cols << c if opts[:c]
+    cols << line_count if opts[:l]
+    cols << word_count if opts[:w]
+    cols << byte_count if opts[:c]
     rows << (cols + [path])
   end
 
@@ -59,3 +59,8 @@ else
     rows << (cols + ['total'])
   end
 end
+
+col_count = [:l, :w, :c].count { |option_key| opts[option_key] }
+widths = (0...col_count).map { |col_index| rows.map { |row| row[col_index].to_s.length }.max || 0 }
+rows.each { |row| num = (0...col_count).map { |col_index| row[col_index].to_s.rjust(widths[col_index]) }.join(' '); row[col_count] ? (puts "#{num} #{row[col_count]}") : (puts num) }
+
