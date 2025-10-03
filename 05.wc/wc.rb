@@ -15,48 +15,41 @@ end
 
 opts = parse_options
 opts = { l: true, w: true, c: true } unless opts.values.any?
-pipe_input = ARGV.empty? && !$stdin.tty?
+stdin_mode = ARGV.empty?
+input_files =
+  if stdin_mode
+    [{ name: nil, content: $stdin.read }]
+  else
+    ARGV.map { |path| { name: path, content: File.read(path, mode: 'rb') } }
+  end
 rows = []
 
-if pipe_input
-  text  = $stdin.read
-  lines = text.count("\n")
-  words = text.scan(/\S+/).length
-  bytes = text.bytesize
+total_l = 0
+total_w = 0
+total_c = 0
+
+input_files.each do |file|
+  line_count = file[:content].count("\n")
+  word_count = file[:content].scan(/\S+/).length
+  byte_count = file[:content].bytesize
 
   cols = []
-  cols << lines if opts[:l]
-  cols << words if opts[:w]
-  cols << bytes if opts[:c]
-  rows << (cols + [nil])
-else
-  total_l = 0
-  total_w = 0
-  total_c = 0
+  cols << line_count if opts[:l]
+  cols << word_count if opts[:w]
+  cols << byte_count if opts[:c]
+  rows << (cols + [file[:name]])
 
-  ARGV.each do |path|
-    content = File.read(path, mode: 'rb')
-    line_count = content.count("\n")
-    word_count = content.scan(/\S+/).length
-    byte_count = content.bytesize
-    total_l += line_count
-    total_w += word_count
-    total_c += byte_count
+  total_l += line_count
+  total_w += word_count
+  total_c += byte_count
+end
 
-    cols = []
-    cols << line_count if opts[:l]
-    cols << word_count if opts[:w]
-    cols << byte_count if opts[:c]
-    rows << (cols + [path])
-  end
-
-  if ARGV.size >= 2
-    cols = []
-    cols << total_l if opts[:l]
-    cols << total_w if opts[:w]
-    cols << total_c if opts[:c]
-    rows << (cols + ['total'])
-  end
+if input_files.size >= 2
+  cols = []
+  cols << total_l if opts[:l]
+  cols << total_w if opts[:w]
+  cols << total_c if opts[:c]
+  rows << (cols + ['total'])
 end
 
 col_count = %i[l w c].count { |option_key| opts[option_key] }
