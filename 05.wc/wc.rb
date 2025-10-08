@@ -52,15 +52,15 @@ if input_files.size >= 2
   rows << (cols + ['total'])
 end
 
-col_count = %i[l w c].count { |option_key| opts[option_key] }
-widths = Array.new(col_count, 8)
+enabled_metric_count = %i[l w c].count { |option_key| opts[option_key] }
+widths = Array.new(enabled_metric_count, 8)
 
-rows.each do |row|
-  numbers = (0...col_count).map { |col_index| row[col_index].to_s.rjust(widths[col_index]) }
-  num_part = numbers.join
-  if row[col_count]
-    puts "#{num_part} #{row[col_count]}"
+rows.each do |result_row|
+  formatted_columns = (0...enabled_metric_count).map { |col_index| result_row[col_index].to_s.rjust(widths[col_index]) }
+  formatted_row = formatted_columns.join
+  if result_row[enabled_metric_count]
+    puts "#{formatted_row} #{result_row[enabled_metric_count]}"
   else
-    puts num_part
+    puts formatted_row
   end
 end
