@@ -46,11 +46,11 @@ enabled_metric_keys = %i[l w c].select { |k| opts[k] }
 COLUMN_WIDTH = 8
 widths = Array.new(enabled_metric_keys.size, COLUMN_WIDTH)
 
-rows.each do |file_result|
-  formatted_columns = enabled_metric_keys.map.with_index { |k, i| file_result[k].to_s.rjust(widths[i]) }
+rows.each do |row|
+  formatted_columns = enabled_metric_keys.map.with_index { |k, i| row[k].to_s.rjust(widths[i]) }
   formatted_row = formatted_columns.join
-  if file_result[:name]
-    puts "#{formatted_row} #{file_result[:name]}"
+  if row[:name]
+    puts "#{formatted_row} #{row[:name]}"
   else
     puts formatted_row
   end
