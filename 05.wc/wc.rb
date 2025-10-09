@@ -37,7 +37,7 @@ input_files.each do |file|
   cols << line_count if opts[:l]
   cols << word_count if opts[:w]
   cols << byte_count if opts[:c]
-  rows << (cols + [file[:name]])
+  rows << { l: line_count, w: word_count, c: byte_count, name: file[:name] }
 
   total_l += line_count
   total_w += word_count
@@ -49,17 +49,17 @@ if input_files.size >= 2
   cols << total_l if opts[:l]
   cols << total_w if opts[:w]
   cols << total_c if opts[:c]
-  rows << (cols + ['total'])
+  rows << { l: total_l, w: total_w, c: total_c, name: 'total' }
 end
 
-enabled_metric_count = %i[l w c].count { |option_key| opts[option_key] }
-widths = Array.new(enabled_metric_count, 8)
+enabled_metric_keys = %i[l w c].select { |k| opts[k] }
+widths = Array.new(enabled_metric_keys.size, 8)
 
-rows.each do |result_row|
-  formatted_columns = (0...enabled_metric_count).map { |col_index| result_row[col_index].to_s.rjust(widths[col_index]) }
+rows.each do |row|
+  formatted_columns = enabled_metric_keys.map.with_index { |k, i| row[k].to_s.rjust(widths[i]) }
   formatted_row = formatted_columns.join
-  if result_row[enabled_metric_count]
-    puts "#{formatted_row} #{result_row[enabled_metric_count]}"
+  if row[:name]
+    puts "#{formatted_row} #{row[:name]}"
   else
     puts formatted_row
   end
