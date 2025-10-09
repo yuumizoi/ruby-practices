@@ -33,10 +33,6 @@ input_files.each do |file|
   word_count = file[:content].scan(/\S+/).length
   byte_count = file[:content].bytesize
 
-  cols = []
-  cols << line_count if opts[:l]
-  cols << word_count if opts[:w]
-  cols << byte_count if opts[:c]
   rows << { l: line_count, w: word_count, c: byte_count, name: file[:name] }
 
   total_l += line_count
@@ -44,13 +40,7 @@ input_files.each do |file|
   total_c += byte_count
 end
 
-if input_files.size >= 2
-  cols = []
-  cols << total_l if opts[:l]
-  cols << total_w if opts[:w]
-  cols << total_c if opts[:c]
-  rows << { l: total_l, w: total_w, c: total_c, name: 'total' }
-end
+rows << { l: total_l, w: total_w, c: total_c, name: 'total' } if input_files.size >= 2
 
 enabled_metric_keys = %i[l w c].select { |k| opts[k] }
 widths = Array.new(enabled_metric_keys.size, 8)
