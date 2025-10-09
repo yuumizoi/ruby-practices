@@ -15,9 +15,8 @@ end
 
 opts = parse_options
 opts = { l: true, w: true, c: true } unless opts.values.any?
-stdin_mode = ARGV.empty?
 input_files =
-  if stdin_mode
+  if ARGV.empty?
     [{ name: nil, content: $stdin.read }]
   else
     ARGV.map { |path| { name: path, content: File.read(path, mode: 'rb') } }
