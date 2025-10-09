@@ -49,9 +49,5 @@ widths = Array.new(enabled_metric_keys.size, COLUMN_WIDTH)
 rows.each do |row|
   formatted_columns = enabled_metric_keys.map.with_index { |k, i| row[k].to_s.rjust(widths[i]) }
   formatted_row = formatted_columns.join
-  if row[:name]
-    puts "#{formatted_row} #{row[:name]}"
-  else
-    puts formatted_row
-  end
+  puts [formatted_row, row[:name]].compact.join(' ')
 end
