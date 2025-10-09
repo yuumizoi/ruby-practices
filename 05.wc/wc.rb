@@ -14,7 +14,7 @@ def parse_options
 end
 
 opts = parse_options
-opts = { l: true, w: true, c: true } unless opts.values.any?
+opts = { l: true, w: true, c: true } if opts.values.none?
 input_files =
   if ARGV.empty?
     [{ name: nil, content: $stdin.read }]
