@@ -43,7 +43,8 @@ end
 rows << { l: total_l, w: total_w, c: total_c, name: 'total' } if input_files.size >= 2
 
 enabled_metric_keys = %i[l w c].select { |k| opts[k] }
-widths = Array.new(enabled_metric_keys.size, 8)
+COLUMN_WIDTH = 8
+widths = Array.new(enabled_metric_keys.size, COLUMN_WIDTH)
 
 rows.each do |row|
   formatted_columns = enabled_metric_keys.map.with_index { |k, i| row[k].to_s.rjust(widths[i]) }
