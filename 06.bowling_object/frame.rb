@@ -10,11 +10,11 @@ class Frame
   end
 
   def spare?
-    !strike? && @shots[0..1].sum { |shot| shot.pins } == 10
+    !strike? && @shots[0..1].sum(&:pins) == 10
   end
 
   def score
-    @shots.sum { |shot| shot.pins }
+    @shots.sum(&:pins)
   end
 
   def pins_at(index)

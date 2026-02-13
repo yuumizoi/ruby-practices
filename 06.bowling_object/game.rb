@@ -14,9 +14,7 @@ class Game
     total_score = 0
     @frames.each_with_index do |frame, i|
       total_score += frame.score
-      if i < 9 && (frame.strike? || frame.spare?)
-        total_score += bonus_score(i, frame.strike?)
-      end
+      total_score += bonus_score(i, frame.strike?) if i < 9 && (frame.strike? || frame.spare?)
     end
     total_score
   end
@@ -51,4 +49,3 @@ class Game
     end
   end
 end
-
