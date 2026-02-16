@@ -43,7 +43,13 @@ class Game
   def bonus_score(index, is_strike)
     next_frame = @frames[index + 1]
     if is_strike
-      next_frame.pins_at(0) + (next_frame.pins_at(1) || @frames[index + 2].pins_at(0))
+      bonus = next_frame.pins_at(0)
+      bonus += if next_frame.strike? && index < 8
+                 @frames[index + 2].pins_at(0)
+               else
+                 next_frame.pins_at(1)
+               end
+      bonus
     else
       next_frame.pins_at(0)
     end
