@@ -6,52 +6,31 @@ require_relative 'frame'
 class Game
   def initialize(score_string)
     marks = score_string.split(',')
-    @shots = marks.map { |mark| Shot.new(mark) }
-    @frames = build_frames
+    shots = marks.map { |mark| Shot.new(mark) }
+    @frames = build_frames(shots)
   end
 
-  def calculate_total_score
-    total_score = 0
-    @frames.each_with_index do |frame, i|
-      total_score += frame.score
-      total_score += bonus_score(i, frame.strike?) if i < 9 && (frame.strike? || frame.spare?)
-    end
-    total_score
+  def calculate_score
+    @frames.sum { |frame| frame.calculate_score(@frames) }
   end
 
   private
 
-  def build_frames
+  def build_frames(shots)
     frames = []
     index = 0
 
-    while index < @shots.length && frames.length < 10
+    while frames.length < 10
       if frames.length == 9
-        frames << Frame.new(@shots[index..])
-        break
-      elsif @shots[index].pins == 10
-        frames << Frame.new([@shots[index]])
+        frames << Frame.new(frames.length, shots[index..])
+      elsif shots[index].strike?
+        frames << Frame.new(frames.length, [shots[index]])
         index += 1
       else
-        frames << Frame.new([@shots[index], @shots[index + 1]])
+        frames << Frame.new(frames.length, shots[index, 2])
         index += 2
       end
     end
     frames
-  end
-
-  def bonus_score(index, is_strike)
-    next_frame = @frames[index + 1]
-    if is_strike
-      bonus = next_frame.pins_at(0)
-      bonus += if next_frame.strike? && index < 8
-                 @frames[index + 2].pins_at(0)
-               else
-                 next_frame.pins_at(1)
-               end
-      bonus
-    else
-      next_frame.pins_at(0)
-    end
   end
 end

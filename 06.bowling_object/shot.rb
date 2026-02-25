@@ -7,6 +7,10 @@ class Shot
     @pins = convert_to_pins(mark)
   end
 
+  def strike?
+    @pins == 10
+  end
+
   private
 
   def convert_to_pins(mark)
