@@ -19,17 +19,16 @@ class Game
   def build_frames(shots)
     frames = []
     index = 0
-
-    while frames.length < 10
-      if frames.length == 9
-        frames << Frame.new(frames.length, shots[index..])
-      elsif shots[index].strike?
-        frames << Frame.new(frames.length, [shots[index]])
-        index += 1
-      else
-        frames << Frame.new(frames.length, shots[index, 2])
-        index += 2
-      end
+    while index < shots.size
+      shot_length = if frames.length == 9
+                      shots.size - index
+                    elsif shots[index].strike?
+                      1
+                    else
+                      2
+                    end
+      frames << Frame.new(frames.length, shots[index, shot_length])
+      index += shot_length
     end
     frames
   end
