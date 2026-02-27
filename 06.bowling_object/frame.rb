@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Frame
+  LAST_FRAME = 9
+
   def initialize(index, shots)
     @index = index
     @shots = shots
@@ -31,12 +33,12 @@ class Frame
   end
 
   def bonus_score(all_frames)
-    return 0 if @index == 9
+    return 0 if @index == LAST_FRAME
 
     next_frame = all_frames[@index + 1]
     if strike?
       bonus = next_frame.pins_at(0)
-      bonus += if next_frame.strike? && @index < 8
+      bonus += if next_frame.strike? && @index < LAST_FRAME - 1
                  all_frames[@index + 2].pins_at(0)
                else
                  next_frame.pins_at(1)
