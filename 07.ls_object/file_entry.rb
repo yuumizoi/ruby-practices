@@ -10,4 +10,18 @@ class FileEntry
     @name = name
     @stat = File.lstat(name)
   end
+
+  FTYPE_TO_CHAR = {
+  'directory' => 'd',
+  'link' => 'l',
+  'characterSpecial' => 'c',
+  'blockSpecial' => 'b',
+  'socket' => 's',
+  'fifo' => 'p',
+  'file' => '-'
+  }.freeze
+
+  def type_char
+    FTYPE_TO_CHAR.fetch(@stat.ftype, '?')
+  end
 end
