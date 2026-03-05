@@ -24,4 +24,13 @@ class FileEntry
   def type_char
     FTYPE_TO_CHAR.fetch(@stat.ftype, '?')
   end
+
+  def permissions_str
+    m = @stat.mode & 0o777
+    (0..8).map { |i| rwx_char(m, 0o400 >> i, 'rwx'[i % 3]) }.join
+  end
+  
+  def rwx_char(mode, mask, char)
+    (mode & mask).zero? ? '-' : char
+  end
 end
