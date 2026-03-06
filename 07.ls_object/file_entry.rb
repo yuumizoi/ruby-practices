@@ -29,8 +29,16 @@ class FileEntry
     m = @stat.mode & 0o777
     (0..8).map { |i| rwx_char(m, 0o400 >> i, 'rwx'[i % 3]) }.join
   end
-  
+
   def rwx_char(mode, mask, char)
     (mode & mask).zero? ? '-' : char
+  end
+
+  def user_name
+    Etc.getpwuid(@stat.uid).name
+  end
+
+  def group_name
+    Etc.getgrgid(@stat.gid).name
   end
 end
