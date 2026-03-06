@@ -41,4 +41,12 @@ class FileEntry
   def group_name
     Etc.getgrgid(@stat.gid).name
   end
+
+  def size
+    @stat.size
+  end
+
+  def mtime
+    @stat.mtime.strftime('%-m %e %H:%M')
+  end
 end
