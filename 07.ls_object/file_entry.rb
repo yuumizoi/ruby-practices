@@ -49,4 +49,8 @@ class FileEntry
   def mtime
     @stat.mtime.strftime('%-m %e %H:%M')
   end
+
+  def mode_str
+    type_char + permissions_str
+  end
 end
