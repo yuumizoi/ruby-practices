@@ -14,4 +14,10 @@ class FileSystem
     list.reverse! if @reverse
     list
   end
+
+  def entries
+    names.map do |name|
+      FileEntry.new(name)
+    end
+  end
 end
