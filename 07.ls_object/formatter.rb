@@ -24,4 +24,11 @@ class Formatter
     return "" if entry.nil?
     entry.name.ljust(max_name_width + 2)
   end
+
+  def display
+    ordered_rows.each do |row|
+      line = row.map { |entry| format_name(entry) }.join
+      puts line.rstrip
+    end
+  end
 end
