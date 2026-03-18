@@ -53,4 +53,12 @@ class FileEntry
   def mode_str
     type_char + permissions_str
   end
+  
+  def nlink
+    @stat.nlink
+  end
+
+  def blocks
+    @stat.blocks
+  end
 end
