@@ -38,5 +38,16 @@ class Formatter
 
   def display_long
     puts "total #{total_blocks}"
+    @entries.each do |entry|
+      puts [
+        entry.mode_str,
+        entry.nlink,
+        entry.user_name,
+        entry.group_name,
+        entry.size,
+        entry.mtime,
+        entry.name
+      ].join(" ")
+    end
   end
 end
