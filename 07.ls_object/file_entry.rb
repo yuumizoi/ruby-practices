@@ -21,11 +21,15 @@ class FileEntry
     'file' => '-'
   }.freeze
 
-  def type_char
+  def mode
+    type + permissions
+  end
+
+  def type
     FTYPE_TO_CHAR.fetch(@stat.ftype, '?')
   end
 
-  def permissions_str
+  def permissions
     m = @stat.mode & 0o777
     (0..8).map { |i| rwx_char(m, 0o400 >> i, 'rwx'[i % 3]) }.join
   end
@@ -34,11 +38,11 @@ class FileEntry
     (mode & mask).zero? ? '-' : char
   end
 
-  def user_name
+  def user
     Etc.getpwuid(@stat.uid).name
   end
 
-  def group_name
+  def group
     Etc.getgrgid(@stat.gid).name
   end
 
@@ -48,10 +52,6 @@ class FileEntry
 
   def mtime
     @stat.mtime.strftime('%-m %e %H:%M')
-  end
-
-  def mode_str
-    type_char + permissions_str
   end
 
   def nlink

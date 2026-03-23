@@ -42,10 +42,10 @@ class Formatter
     puts "total #{total_blocks}"
     @entries.each do |entry|
       puts [
-        entry.mode_str,
+        entry.mode,
         entry.nlink,
-        entry.user_name,
-        entry.group_name,
+        entry.user,
+        entry.group,
         entry.size,
         entry.mtime,
         entry.name
