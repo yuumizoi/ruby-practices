@@ -31,4 +31,12 @@ class Formatter
       puts line.rstrip
     end
   end
+
+  def total_blocks
+    @entries.sum(&:blocks)
+  end
+
+  def display_long
+    puts "total #{total_blocks}"
+  end
 end
