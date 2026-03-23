@@ -4,6 +4,7 @@ class Formatter
   def initialize(entries)
     @entries = entries
   end
+
   def rows_count
     @entries.size.ceildiv(3)
   end
@@ -21,7 +22,8 @@ class Formatter
   end
 
   def format_name(entry)
-    return "" if entry.nil?
+    return '' if entry.nil?
+
     entry.name.ljust(max_name_width + 2)
   end
 
@@ -47,7 +49,7 @@ class Formatter
         entry.size,
         entry.mtime,
         entry.name
-      ].join(" ")
+      ].join(' ')
     end
   end
 end

@@ -5,20 +5,20 @@ require 'shellwords'
 
 class FileEntry
   attr_reader :name
-  
+
   def initialize(name)
     @name = name
     @stat = File.lstat(name)
   end
 
   FTYPE_TO_CHAR = {
-  'directory' => 'd',
-  'link' => 'l',
-  'characterSpecial' => 'c',
-  'blockSpecial' => 'b',
-  'socket' => 's',
-  'fifo' => 'p',
-  'file' => '-'
+    'directory' => 'd',
+    'link' => 'l',
+    'characterSpecial' => 'c',
+    'blockSpecial' => 'b',
+    'socket' => 's',
+    'fifo' => 'p',
+    'file' => '-'
   }.freeze
 
   def type_char
@@ -53,7 +53,7 @@ class FileEntry
   def mode_str
     type_char + permissions_str
   end
-  
+
   def nlink
     @stat.nlink
   end
